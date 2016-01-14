@@ -42,9 +42,13 @@ public:
 	double *x;
 	double *y;
 	double *z;
-	double *p_x;
-	double *p_y;
-	double *p_z;
+	double *px;
+	double *py;
+	double *pz;
+
+	double length_x;
+	double length_y;
+	double length_z;
 
 	double dx;
 	double dy;
@@ -70,10 +74,10 @@ public:
 	const char *R = "REAL";
 	const char *I = "IMAG";
 
-	int get_num_x() { return this->num_x };
-	int get_num_y() { return this->num_y };
-	int get_num_z() { return this->num_z };
-	int get_N() { return this->N };
+	int get_num_x() { return this->num_x; };
+	int get_num_y() { return this->num_y; };
+	int get_num_z() { return this->num_z; };
+	int get_N() { return this->N; };
 
 private:
 	int num_x;
@@ -83,6 +87,6 @@ private:
 
 	double dt;
 
-}
+};
 
 #endif    //    THERMALIZATION_SIM_DATA_H
