@@ -21,31 +21,18 @@
 *SOFTWARE.
 */
 
-#include <stdlib.h>
-#include <iostream>
+#ifndef _SAVE_DATA_H
+#define _SAVE_DATA_H
 
+#include <stdlib.h>
 
 #include "mkl.h"
+#include "fitsio.h"
 
-#include "../include/SimulationData.hpp"
-#include "../include/WaveFunction.hpp"
-#include "../include/Potential.hpp"
-#include "../include/SaveData.hpp"
+#include "SimulationData.hpp"
+#include "WaveFunction.hpp"
+#include "Potential.hpp"
 
-int main() {
+void save_2d_image(SimulationData &sim_data, WaveFunction &psi, const char * fits_file_name);
 
-
-	SimulationData sim_data(128, 128, 128);
-	Potential pot_data(sim_data);
-	WaveFunction psi(sim_data, pot_data.harmonic_trap);
-
-	psi.get_abs(sim_data.get_N());
-	psi.get_norm(sim_data);
-	
-	pot_data.calculate_non_linear_energy(sim_data, psi);
-	
-	system("exec rm testsave.fits");
-	save_2d_image(sim_data, psi, "testsave.fits");
-
-	return 0;
-}
+#endif    //    _SAVE_DATA_H

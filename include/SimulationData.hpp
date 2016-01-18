@@ -78,6 +78,7 @@ public:
 	int get_num_y() { return this->num_y; };
 	int get_num_z() { return this->num_z; };
 	int get_N() { return this->N; };
+	int get_dt() { return this->dt; };
 
 private:
 	int num_x;

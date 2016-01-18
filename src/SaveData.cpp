@@ -22,30 +22,35 @@
 */
 
 #include <stdlib.h>
-#include <iostream>
-
 
 #include "mkl.h"
 
-#include "../include/SimulationData.hpp"
-#include "../include/WaveFunction.hpp"
-#include "../include/Potential.hpp"
 #include "../include/SaveData.hpp"
 
-int main() {
+void save_2d_image(SimulationData &sim_data, WaveFunction &psi, const char * fits_file_name) {
+
+	double *save_data;
+	save_data = (double*)mkl_malloc(sim_data.get_num_x() * sim_data.get_num_y() * sizeof(double), 64);
+	fitsfile *fptr;
+	int status = 0;
+	long fpixel = 1, naxis = 2, nelements;
+	long naxes[2] = {sim_data.get_num_y(), sim_data.get_num_x()};
+
+	for (int i = 0; i < sim_data.get_num_x(); ++i) {
+		for (int j = 0; j < sim_data.get_num_y(); ++j) {
+			save_data[i * sim_data.get_num_y() + j] = 0;
+			for (int k = 0; k < sim_data.get_num_z(); ++k) {
+				save_data[i * sim_data.get_num_y() + j] += psi.abs_psi[i * sim_data.get_num_y() * sim_data.get_num_z() + j * sim_data.get_num_z() + k];
+			}
+		}
+	}
+
+	fits_create_file(&fptr, fits_file_name, &status);
+	fits_create_img(fptr, DOUBLE_IMG, naxis, naxes, &status);
+	nelements = naxes[0] * naxes[1];
+	fits_write_img(fptr, TDOUBLE, fpixel, nelements, save_data, &status);
+	fits_close_file(fptr, &status);
+	fits_report_error(stderr, status);	
 
 
-	SimulationData sim_data(128, 128, 128);
-	Potential pot_data(sim_data);
-	WaveFunction psi(sim_data, pot_data.harmonic_trap);
-
-	psi.get_abs(sim_data.get_N());
-	psi.get_norm(sim_data);
-	
-	pot_data.calculate_non_linear_energy(sim_data, psi);
-	
-	system("exec rm testsave.fits");
-	save_2d_image(sim_data, psi, "testsave.fits");
-
-	return 0;
 }
