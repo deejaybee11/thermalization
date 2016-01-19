@@ -21,8 +21,8 @@
 *SOFTWARE.
 */
 
-#ifndef _POTENTIAL_H
-#define _POTENTIAL_H
+#ifndef _SOLVE_H
+#define _SOLVE_H
 
 #include <stdlib.h>
 
@@ -30,22 +30,13 @@
 
 #include "SimulationData.hpp"
 #include "WaveFunction.hpp"
+#include "Potential.hpp"
+#include "Solve.hpp"
 
-class Potential {
-public:
-	Potential(SimulationData &sim_data);
-	~Potential();
+void solve_imag(SimulationData &sim_data, WaveFunction &psi, Potential &pot_data);
 
-	double *harmonic_trap;
-	double *non_linear;
-	double *kinetic_energy;
-	MKL_Complex16 *pos_time_evolution;
-	MKL_Complex16 *mom_time_evolution;
+void solve_real(SimulationData &sim_data, WaveFunction &psi, Potential &pot_data);
 
-	void calculate_non_linear_energy(SimulationData &sim_data, WaveFunction &psi);
-	void assign_position_time_evolution(SimulationData &sim_data, WaveFunction &psi, bool trap_on, bool is_real);
-	void assign_momentum_time_evolution(SimulationData &sim_data, WaveFunction &psi, bool is_real);
 
-};
+#endif    //    _SOLVE_H
 
-#endif    //    _POTENTIAL_H

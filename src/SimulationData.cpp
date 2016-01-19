@@ -36,8 +36,13 @@ SimulationData::SimulationData(int num_x, int num_y, int num_z) {
 	this->num_z = num_z;
 	this->N = num_x * num_y * num_z;
 
-	this->num_I_steps = 100000;
-	this->num_R_steps = 100000;
+
+	this->length_x = 100;
+	this->length_y = 100;
+	this->length_z = 100;
+
+	this->num_I_steps = 10000;
+	this->num_R_steps = 10000;
 
 	this->sigma_x = 1;
 	this->sigma_y = 1;
@@ -73,6 +78,9 @@ SimulationData::SimulationData(int num_x, int num_y, int num_z) {
 	this->dx = this->x[1] - this->x[0];
 	this->dy = this->y[1] - this->y[0];
 	this->dz = this->z[1] - this->z[0];
+
+
+	this->dt = 0.01*dx; 
 
 	//Increments for the momenum arrays
 	double ax = -0.5 * this->num_x;

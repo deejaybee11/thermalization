@@ -37,10 +37,14 @@ Potential::Potential(SimulationData &sim_data) {
 	
 	this->harmonic_trap = (double*)mkl_malloc(sim_data.get_N() * sizeof(double), 64);
 	this->non_linear = (double*)mkl_malloc(sim_data.get_N() * sizeof(double), 64);
-	this->time_evolution = (MKL_Complex16*)mkl_malloc(sim_data.get_N() * sizeof(MKL_Complex16), 64);
+	this->kinetic_energy = (double*)mkl_malloc(sim_data.get_N() * sizeof(double), 64);
+	this->pos_time_evolution = (MKL_Complex16*)mkl_malloc(sim_data.get_N() * sizeof(MKL_Complex16), 64);
+	this->mom_time_evolution = (MKL_Complex16*)mkl_malloc(sim_data.get_N() * sizeof(MKL_Complex16), 64);
+
 	
 	//Fill arrays with values
 	double h_pot_val = 0;
+	double k_en_val = 0;
 	int index;
 
 	#pragma omp parallel for private(index, h_pot_val)
@@ -50,9 +54,10 @@ Potential::Potential(SimulationData &sim_data) {
 
 				index = i * sim_data.get_num_x() * sim_data.get_num_z() + j * sim_data.get_num_z() + k;
 				h_pot_val = 0.5 * (pow(sim_data.gamma_x, 2) * pow(sim_data.x[i], 2) + pow(sim_data.gamma_y, 2) * pow(sim_data.y[j], 2) + pow(sim_data.gamma_z, 2) * pow(sim_data.z[k], 2));
+				k_en_val = 0.5 * (pow(sim_data.px[i], 2.0) + pow(sim_data.py[j], 2.0) + pow(sim_data.pz[k], 2.0));
 
 				this->harmonic_trap[index] = h_pot_val; 
-
+				this->kinetic_energy[index] = k_en_val;
 			}
 		}
 	}
@@ -69,20 +74,65 @@ void Potential::calculate_non_linear_energy(SimulationData &sim_data, WaveFuncti
 	}
 }
 
-void Potential::assign_time_evolution(SimulationData &sim_data, WaveFunction &psi, Potential &potential_data, bool trap_on, bool is_real) {
+void Potential::assign_position_time_evolution(SimulationData &sim_data, WaveFunction &psi, bool trap_on, bool is_real) {
 	
 	double theta;
-	#pragma omp parallel for private(theta)
-	for (int i = 0; i < sim_data.get_N(); ++i) {
-		theta = (this->non_linear[i] + this->harmonic_trap[i]) * sim_data.get_dt();	
-		time_evolution[i].real = cos(theta);
-		time_evolution[i].imag = -1.0 * sin(theta);	
+	if (is_real && trap_on) {
+		#pragma omp parallel for private(theta)
+		for (int i = 0; i < sim_data.get_N(); ++i) {
+			theta = (this->non_linear[i] + this->harmonic_trap[i]) * 0.5 * sim_data.get_dt();	
+			this->pos_time_evolution[i].real = cos(theta);
+			this->pos_time_evolution[i].imag = -1.0 * sin(theta);	
+		}
+	}
+	else if (is_real && trap_on) {
+		#pragma omp parallel for private(theta)
+		for (int i = 0; i < sim_data.get_N(); ++i) {
+			theta = this->non_linear[i]  * 0.5 * sim_data.get_dt();	
+			this->pos_time_evolution[i].real = cos(theta);
+			this->pos_time_evolution[i].imag = -1.0 * sin(theta);	
+		}
+
+	}
+	else {
+		for (int i = 0; i < sim_data.get_N(); ++i) {
+			theta = (this->non_linear[i] + this->harmonic_trap[i]) * 0.5 * sim_data.get_dt();	
+			this->pos_time_evolution[i].real = exp(-1.0 * theta);
+			this->pos_time_evolution[i].imag = 0;	
+		}
 	}
 }
+
+void Potential::assign_momentum_time_evolution(SimulationData &sim_data, WaveFunction &psi, bool is_real) {
+	
+	double theta;
+	if (is_real) {
+		#pragma omp parallel for private(theta)
+		for (int i = 0; i < sim_data.get_N(); ++i) {
+			theta = this->kinetic_energy[i] * sim_data.get_dt();	
+			this->mom_time_evolution[i].real = cos(theta);
+			this->mom_time_evolution[i].imag = -1.0 * sin(theta);	
+		}
+	}
+	else {
+		#pragma omp parallel for private(theta)
+		for (int i = 0; i < sim_data.get_N(); ++i) {
+			theta = this->kinetic_energy[i] * sim_data.get_dt();	
+			this->mom_time_evolution[i].real = exp(-1.0 * theta);
+			this->mom_time_evolution[i].imag = 0;	
+		}
+	}
+}
+
+
 
 Potential::~Potential() {
 
 	mkl_free(harmonic_trap);
 	mkl_free(non_linear);
+	mkl_free(kinetic_energy);
+	mkl_free(pos_time_evolution);
+	mkl_free(mom_time_evolution);
+
 }
 

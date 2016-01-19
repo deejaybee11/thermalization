@@ -42,7 +42,7 @@ WaveFunction::WaveFunction(SimulationData &sim_data, double *harmonic_trap) {
 		for (int j = 0; j < sim_data.get_num_y(); ++j) {
 			for (int k = 0; k < sim_data.get_num_z(); ++k) {
 				index = i * sim_data.get_num_y() * sim_data.get_num_z() + j * sim_data.get_num_z() + k;
-				this->psi[index].real = exp(-1.0 * (pow(sim_data.x[i], 2.0) + pow(sim_data.y[j], 2.0) + pow(sim_data.z[k], 2.0)) / 2.0);
+				this->psi[index].real = exp(-1.0 * (pow(sim_data.x[i], 2.0) + pow(sim_data.y[j], 2.0) + pow(sim_data.z[k], 2.0)) / 8.0);
 				this->psi[index].imag = 0;
 			}
 		}
@@ -54,19 +54,23 @@ void WaveFunction::get_norm(SimulationData &sim_data) {
 	double psi_sum = 0;
 	double temp_real = 0;
 	double temp_imag = 0;
+	double norm_fac;
 	
 	for (int i = 0; i < sim_data.get_N(); ++i) {
 		psi_sum += this->abs_psi[i];
 	}
 
-	this->norm_psi = sqrt(1.0 / (psi_sum * sim_data.dx * sim_data.dy * sim_data.dz));
-
+	norm_fac = sqrt(1.0 / (psi_sum * sim_data.dx * sim_data.dy * sim_data.dz));
+	
 	for (int i = 0; i < sim_data.get_N(); ++i) {
-		temp_real = this->psi[i].real * this->norm_psi;
-		temp_imag = this->psi[i].imag * this->norm_psi;
+		temp_real = this->psi[i].real * norm_fac;
+		temp_imag = this->psi[i].imag * norm_fac;
 		this->psi[i].real = temp_real;
 		this->psi[i].imag = temp_imag;
 	}
+
+
+	
 }
 
 void WaveFunction::get_abs(int N) {

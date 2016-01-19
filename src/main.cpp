@@ -31,11 +31,16 @@
 #include "../include/WaveFunction.hpp"
 #include "../include/Potential.hpp"
 #include "../include/SaveData.hpp"
+#include "../include/Solve.hpp"
 
 int main() {
 
+	putenv("KMP_BLOCKTIME=infinite");
+	putenv("KMP_AFFINITY=verbose,granularity=fine,compact,norespect");
+	mkl_set_num_threads(mkl_get_max_threads());
+	mkl_disable_fast_mm();
 
-	SimulationData sim_data(128, 128, 128);
+	SimulationData sim_data(128, 1024, 128);
 	Potential pot_data(sim_data);
 	WaveFunction psi(sim_data, pot_data.harmonic_trap);
 
@@ -43,9 +48,22 @@ int main() {
 	psi.get_norm(sim_data);
 	
 	pot_data.calculate_non_linear_energy(sim_data, psi);
+	pot_data.assign_position_time_evolution(sim_data, psi, true, false);
+	pot_data.assign_momentum_time_evolution(sim_data, psi, false);
 	
-	system("exec rm testsave.fits");
+	system("exec rm *.fits");
 	save_2d_image(sim_data, psi, "testsave.fits");
+
+	solve_imag(sim_data, psi, pot_data);
+
+	save_2d_image(sim_data, psi, "testground.fits");
+
+	pot_data.assign_position_time_evolution(sim_data, psi, false, true);
+	pot_data.assign_momentum_time_evolution(sim_data, psi, true);
+
+	solve_real(sim_data, psi, pot_data);
+
+	save_2d_image(sim_data, psi, "testexpand.fits");
 
 	return 0;
 }
