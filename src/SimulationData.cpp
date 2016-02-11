@@ -28,6 +28,9 @@
 #define _USE_MATH_DEFINES
 #include <math.h>
 
+#include "dmalloc.h"
+
+
 //Class constructor
 SimulationData::SimulationData(int num_x, int num_y, int num_z) {
 
@@ -37,19 +40,19 @@ SimulationData::SimulationData(int num_x, int num_y, int num_z) {
 	this->N = num_x * num_y * num_z;
 
 
-	this->length_x = 100;
-	this->length_y = 100;
-	this->length_z = 100;
+	this->length_x = 50;
+	this->length_y = 50;
+	this->length_z = 50;
 
-	this->num_I_steps = 10000;
-	this->num_R_steps = 10000;
+	this->num_I_steps = 0;
+	this->num_R_steps = 1;
 
 	this->sigma_x = 1;
 	this->sigma_y = 1;
 	this->sigma_z = 1;
 
 	this->gamma_x = 1;
-	this->gamma_y = 1.2;
+	this->gamma_y = 2;
 	this->gamma_z = 3;
 
 	this->beta = 1;
@@ -105,6 +108,30 @@ SimulationData::SimulationData(int num_x, int num_y, int num_z) {
 		this->pz[i] = (2 * M_PI / this->length_z) * az + i * step_z;
 	}
 
+	double temp;
+	int n2[3];
+
+	n2[0] = this->get_num_x() / 2.0;
+	n2[1] = this->get_num_y() / 2.0;
+	n2[2] = this->get_num_z() / 2.0;
+	for (int i = 0; i < n2[0]; ++i)
+	{
+		temp = this->px[i];
+		this->px[i] = this->px[i + n2[0]];
+		this->px[i+n2[0]] = temp;
+	}
+	for (int i = 0; i < n2[1]; ++i)
+	{
+		temp = this->py[i];
+		this->py[i] = this->py[i + n2[1]];
+		this->py[i+n2[1]] = temp;
+	}
+	for (int i = 0; i < n2[2]; ++i)
+	{
+		temp = this->pz[i];
+		this->pz[i] = this->pz[i + n2[2]];
+		this->pz[i+n2[2]] = temp;
+	}
 };
 
 //Class destructor

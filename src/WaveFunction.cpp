@@ -30,6 +30,8 @@
 
 #include "../include/SimulationData.hpp"
 #include "../include/Potential.hpp"
+#include "dmalloc.h"
+
 
 WaveFunction::WaveFunction(SimulationData &sim_data, double *harmonic_trap) {
 
@@ -41,9 +43,18 @@ WaveFunction::WaveFunction(SimulationData &sim_data, double *harmonic_trap) {
 	for (int i = 0; i < sim_data.get_num_x(); ++i) {
 		for (int j = 0; j < sim_data.get_num_y(); ++j) {
 			for (int k = 0; k < sim_data.get_num_z(); ++k) {
+
 				index = i * sim_data.get_num_y() * sim_data.get_num_z() + j * sim_data.get_num_z() + k;
-				this->psi[index].real = exp(-1.0 * (pow(sim_data.x[i], 2.0) + pow(sim_data.y[j], 2.0) + pow(sim_data.z[k], 2.0)) / 8.0);
+				this->psi[index].real = exp(-0.5 * (pow(sim_data.x[i], 2.0) + pow(sim_data.y[j], 2.0) + pow(sim_data.z[k], 2.0)));
 				this->psi[index].imag = 0;
+				/*if (sqrt(pow(sim_data.x[i],2.0) + pow(sim_data.y[j], 2.0) + pow(sim_data.z[k], 2.0)) <= 5) {
+					this->psi[index].real = 1;
+					this->psi[index].imag = 0;
+				}
+				else {
+					this->psi[index].real = 0;
+					this->psi[index].imag = 0;
+				}*/
 			}
 		}
 	}

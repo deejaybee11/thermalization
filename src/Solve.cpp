@@ -33,6 +33,9 @@
 #include "../include/WaveFunction.hpp"
 #include "../include/Potential.hpp"
 
+#include "dmalloc.h"
+
+
 void solve_imag(SimulationData &sim_data, WaveFunction &psi, Potential &pot_data) {
 	
 	double temp_real = 0;
@@ -51,25 +54,27 @@ void solve_imag(SimulationData &sim_data, WaveFunction &psi, Potential &pot_data
 		if (i % 500 == 0) {
 			std::cout << "Imaginary step " << i << " out of " << sim_data.num_I_steps << "." << std::endl;
 		}
-
-		vzMul(sim_data.get_N(), psi.psi, pot_data.pos_time_evolution, psi.psi);
+		
+		pot_data.assign_position_time_evolution(sim_data, psi, true, false);
+		
+		//vzMul(sim_data.get_N(), psi.psi, pot_data.pos_time_evolution, psi.psi);
 
 		status = DftiComputeForward(handle, psi.psi, psi.psi);
 
-		vzMul(sim_data.get_N(), psi.psi, pot_data.mom_time_evolution, psi.psi);
+		//vzMul(sim_data.get_N(), psi.psi, pot_data.mom_time_evolution, psi.psi);
 
 		status = DftiComputeBackward(handle, psi.psi, psi.psi);
 
-		vzMul(sim_data.get_N(), psi.psi, pot_data.pos_time_evolution, psi.psi);
+		//vzMul(sim_data.get_N(), psi.psi, pot_data.pos_time_evolution, psi.psi);
 
-		//psi.get_abs(sim_data.get_N());
-		//psi.get_norm(sim_data);
+		psi.get_abs(sim_data.get_N());
+		psi.get_norm(sim_data);
 
 		
 	}
 	
 
-
+	DftiFreeDescriptor(&handle);
 
 }
 
@@ -89,9 +94,11 @@ void solve_real(SimulationData &sim_data, WaveFunction &psi, Potential &pot_data
 	for (int i = 0; i < sim_data.num_R_steps; ++i) {
 
 		if (i % 500 == 0) {
-			std::cout << "Imaginary step " << i << " out of " << sim_data.num_R_steps << "." << std::endl;
+			std::cout << "Real step " << i << " out of " << sim_data.num_R_steps << "." << std::endl;
 		}
-
+		
+		pot_data.assign_position_time_evolution(sim_data, psi, false, true);
+		
 		vzMul(sim_data.get_N(), psi.psi, pot_data.pos_time_evolution, psi.psi);
 
 		status = DftiComputeForward(handle, psi.psi, psi.psi);
@@ -109,6 +116,6 @@ void solve_real(SimulationData &sim_data, WaveFunction &psi, Potential &pot_data
 	}
 	
 
-
+	DftiFreeDescriptor(&handle);
 
 }

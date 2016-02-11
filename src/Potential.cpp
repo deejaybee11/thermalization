@@ -31,10 +31,12 @@
 #include "mkl.h"
 #include "../include/SimulationData.hpp"
 #include "../include/WaveFunction.hpp"
+#include "dmalloc.h"
+
 
 Potential::Potential(SimulationData &sim_data) {
 	//Allocate memory for the arrays
-	
+
 	this->harmonic_trap = (double*)mkl_malloc(sim_data.get_N() * sizeof(double), 64);
 	this->non_linear = (double*)mkl_malloc(sim_data.get_N() * sizeof(double), 64);
 	this->kinetic_energy = (double*)mkl_malloc(sim_data.get_N() * sizeof(double), 64);
@@ -52,7 +54,7 @@ Potential::Potential(SimulationData &sim_data) {
 		for (int j = 0; j < sim_data.get_num_y(); ++j) {
 			for (int k = 0; k < sim_data.get_num_z(); ++k) {
 
-				index = i * sim_data.get_num_x() * sim_data.get_num_z() + j * sim_data.get_num_z() + k;
+				index = i * sim_data.get_num_y() * sim_data.get_num_z() + j * sim_data.get_num_z() + k;
 				h_pot_val = 0.5 * (pow(sim_data.gamma_x, 2) * pow(sim_data.x[i], 2) + pow(sim_data.gamma_y, 2) * pow(sim_data.y[j], 2) + pow(sim_data.gamma_z, 2) * pow(sim_data.z[k], 2));
 				k_en_val = 0.5 * (pow(sim_data.px[i], 2.0) + pow(sim_data.py[j], 2.0) + pow(sim_data.pz[k], 2.0));
 
@@ -61,6 +63,7 @@ Potential::Potential(SimulationData &sim_data) {
 			}
 		}
 	}
+	
 }
 
 void Potential::calculate_non_linear_energy(SimulationData &sim_data, WaveFunction &psi) {
@@ -85,7 +88,7 @@ void Potential::assign_position_time_evolution(SimulationData &sim_data, WaveFun
 			this->pos_time_evolution[i].imag = -1.0 * sin(theta);	
 		}
 	}
-	else if (is_real && trap_on) {
+	else if (is_real && !trap_on) {
 		#pragma omp parallel for private(theta)
 		for (int i = 0; i < sim_data.get_N(); ++i) {
 			theta = this->non_linear[i]  * 0.5 * sim_data.get_dt();	
@@ -126,7 +129,7 @@ void Potential::assign_momentum_time_evolution(SimulationData &sim_data, WaveFun
 
 
 
-Potential::~Potential() {
+Potential::~Potential() { 
 
 	mkl_free(harmonic_trap);
 	mkl_free(non_linear);

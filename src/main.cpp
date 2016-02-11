@@ -33,14 +33,16 @@
 #include "../include/SaveData.hpp"
 #include "../include/Solve.hpp"
 
+#include "dmalloc.h"
+
 int main() {
 
 	putenv("KMP_BLOCKTIME=infinite");
 	putenv("KMP_AFFINITY=verbose,granularity=fine,compact,norespect");
 	mkl_set_num_threads(mkl_get_max_threads());
 	mkl_disable_fast_mm();
-
-	SimulationData sim_data(128, 1024, 128);
+	
+	SimulationData sim_data(64, 64, 64);
 	Potential pot_data(sim_data);
 	WaveFunction psi(sim_data, pot_data.harmonic_trap);
 
@@ -52,18 +54,27 @@ int main() {
 	pot_data.assign_momentum_time_evolution(sim_data, psi, false);
 	
 	system("exec rm *.fits");
+	psi.get_abs(sim_data.get_N());
 	save_2d_image(sim_data, psi, "testsave.fits");
+	save_3d_image(sim_data, psi, "testsave3D.fits");
 
 	solve_imag(sim_data, psi, pot_data);
 
+	psi.get_abs(sim_data.get_N());
 	save_2d_image(sim_data, psi, "testground.fits");
+	save_3d_image(sim_data, psi, "testground3D.fits");
 
 	pot_data.assign_position_time_evolution(sim_data, psi, false, true);
 	pot_data.assign_momentum_time_evolution(sim_data, psi, true);
 
 	solve_real(sim_data, psi, pot_data);
+	
+	printf("Solving complete\n");
 
+	psi.get_abs(sim_data.get_N());
 	save_2d_image(sim_data, psi, "testexpand.fits");
-
+	save_3d_image(sim_data, psi, "testexpand3D.fits");
+		
+	dmalloc_shutdown;
 	return 0;
 }

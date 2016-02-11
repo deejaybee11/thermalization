@@ -26,6 +26,8 @@
 #include "mkl.h"
 
 #include "../include/SaveData.hpp"
+#include "dmalloc.h"
+
 
 void save_2d_image(SimulationData &sim_data, WaveFunction &psi, const char * fits_file_name) {
 
@@ -52,5 +54,23 @@ void save_2d_image(SimulationData &sim_data, WaveFunction &psi, const char * fit
 	fits_close_file(fptr, &status);
 	fits_report_error(stderr, status);	
 
+	mkl_free(save_data);
+
+
+}
+
+void save_3d_image(SimulationData &sim_data, WaveFunction &psi, const char * fits_file_name) {
+
+	fitsfile *fptr;
+	int status = 0;
+	long fpixel = 1, naxis = 3, nelements;
+	long naxes[3] = {sim_data.get_num_x(), sim_data.get_num_y(), sim_data.get_num_z()};
+
+	fits_create_file(&fptr, fits_file_name, &status);
+	fits_create_img(fptr, DOUBLE_IMG, naxis, naxes, &status);
+	nelements = naxes[0] * naxes[1] * naxes[2];
+	fits_write_img(fptr, TDOUBLE, fpixel, nelements, psi.abs_psi, &status);
+	fits_close_file(fptr, &status);
+	fits_report_error(stderr, status);	
 
 }
