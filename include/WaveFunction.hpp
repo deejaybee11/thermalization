@@ -37,11 +37,13 @@ public:
 	~WaveFunction();
 
 	MKL_Complex16 *psi;
+	MKL_Complex16 *psi_conj;
 	double *abs_psi;
 	double norm_psi;
 
 	void get_norm(SimulationData &sim_data);
 	void get_abs(int N);
+	void create_superposition(SimulationData &sim_data);
 
 };
 

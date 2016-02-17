@@ -32,8 +32,8 @@
 #include "../include/SimulationData.hpp"
 #include "../include/WaveFunction.hpp"
 #include "../include/Potential.hpp"
+#include "../include/SaveData.hpp"
 
-#include "dmalloc.h"
 
 
 void solve_imag(SimulationData &sim_data, WaveFunction &psi, Potential &pot_data) {
@@ -48,29 +48,32 @@ void solve_imag(SimulationData &sim_data, WaveFunction &psi, Potential &pot_data
 	status = DftiSetValue(handle, DFTI_BACKWARD_SCALE, (1.0 / (N[0] * N[1] * N[2])));
 	status = DftiCommitDescriptor(handle);
 
-
-	for (int i = 0; i < sim_data.num_I_steps; ++i) {
-
-		if (i % 500 == 0) {
-			std::cout << "Imaginary step " << i << " out of " << sim_data.num_I_steps << "." << std::endl;
+	double temp_chem = 0;
+	bool BREAK = false;
+	int i = 0;
+	
+	for (int i = 0; i < sim_data.num_I_steps; ++i) { 
+		if (i % 100 == 0) {
+			std::cout << "Imaginary step " << i << " out of " << sim_data.num_I_steps << std::endl;
 		}
+		
+		psi.get_abs(sim_data.get_N());
+		psi.get_norm(sim_data);
+		
+		pot_data.calculate_non_linear_energy(sim_data, psi);
 		
 		pot_data.assign_position_time_evolution(sim_data, psi, true, false);
 		
-		//vzMul(sim_data.get_N(), psi.psi, pot_data.pos_time_evolution, psi.psi);
+		vzMul(sim_data.get_N(), psi.psi, pot_data.pos_time_evolution, psi.psi);
 
 		status = DftiComputeForward(handle, psi.psi, psi.psi);
 
-		//vzMul(sim_data.get_N(), psi.psi, pot_data.mom_time_evolution, psi.psi);
+		vzMul(sim_data.get_N(), psi.psi, pot_data.mom_time_evolution, psi.psi);
 
 		status = DftiComputeBackward(handle, psi.psi, psi.psi);
 
-		//vzMul(sim_data.get_N(), psi.psi, pot_data.pos_time_evolution, psi.psi);
+		vzMul(sim_data.get_N(), psi.psi, pot_data.pos_time_evolution, psi.psi);
 
-		psi.get_abs(sim_data.get_N());
-		psi.get_norm(sim_data);
-
-		
 	}
 	
 

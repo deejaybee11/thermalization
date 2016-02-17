@@ -33,16 +33,24 @@
 #include "../include/SaveData.hpp"
 #include "../include/Solve.hpp"
 
-#include "dmalloc.h"
+#if !defined(MKL_ILP64)
+	#define LI "%li"
+	#else
+	#define LI "%lli"
+#endif
+
 
 int main() {
 
-	putenv("KMP_BLOCKTIME=infinite");
+	putenv("KMP_BLOCKTIME=0");
 	putenv("KMP_AFFINITY=verbose,granularity=fine,compact,norespect");
+	system("echo KMP_BLOCKTIME = $KMP_BLOCKTIME");
+	system("echo KMP_AFFINITY = $KMP_AFFINITY");
 	mkl_set_num_threads(mkl_get_max_threads());
 	mkl_disable_fast_mm();
+	system("exec rm *.fits");
 	
-	SimulationData sim_data(64, 64, 64);
+	SimulationData sim_data(128, 1024, 128);
 	Potential pot_data(sim_data);
 	WaveFunction psi(sim_data, pot_data.harmonic_trap);
 
@@ -52,9 +60,8 @@ int main() {
 	pot_data.calculate_non_linear_energy(sim_data, psi);
 	pot_data.assign_position_time_evolution(sim_data, psi, true, false);
 	pot_data.assign_momentum_time_evolution(sim_data, psi, false);
-	
-	system("exec rm *.fits");
-	psi.get_abs(sim_data.get_N());
+
+
 	save_2d_image(sim_data, psi, "testsave.fits");
 	save_3d_image(sim_data, psi, "testsave3D.fits");
 
@@ -63,6 +70,8 @@ int main() {
 	psi.get_abs(sim_data.get_N());
 	save_2d_image(sim_data, psi, "testground.fits");
 	save_3d_image(sim_data, psi, "testground3D.fits");
+
+	psi.create_superposition(sim_data);
 
 	pot_data.assign_position_time_evolution(sim_data, psi, false, true);
 	pot_data.assign_momentum_time_evolution(sim_data, psi, true);
@@ -75,6 +84,5 @@ int main() {
 	save_2d_image(sim_data, psi, "testexpand.fits");
 	save_3d_image(sim_data, psi, "testexpand3D.fits");
 		
-	dmalloc_shutdown;
 	return 0;
 }

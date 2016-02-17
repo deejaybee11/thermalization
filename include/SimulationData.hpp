@@ -53,6 +53,9 @@ public:
 	double dx;
 	double dy;
 	double dz;
+	double dx2;
+	double dy2;
+	double dz2;
 	double dpx;
 	double dpy;
 	double dpz;
@@ -67,7 +70,9 @@ public:
 
 	double beta;
 
-	double *chemical_potential;
+	double laser_kick;
+
+	double chemical_potential;
 	
 	int num_R_steps;
 	int num_I_steps;
@@ -78,7 +83,7 @@ public:
 	int get_num_y() { return this->num_y; };
 	int get_num_z() { return this->num_z; };
 	int get_N() { return this->N; };
-	int get_dt() { return this->dt; };
+	double get_dt() { return this->dt; };
 
 private:
 	int num_x;

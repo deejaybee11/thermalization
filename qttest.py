@@ -32,7 +32,7 @@ class Main(QMainWindow, Ui_MainWindow):
         
     def show_img(self, ):
 
-        self.ax.imshow(self.mydata[:,:,self.matplotScroll.value()])        
+        self.ax.imshow(self.mydata[:,:,self.matplotScroll.value()], vmin=0, vmax = np.amax(self.mydata))        
         self.canvas.draw()
         self.ax.clear()
 

@@ -35,5 +35,6 @@
 
 void save_2d_image(SimulationData &sim_data, WaveFunction &psi, const char * fits_file_name);
 void save_3d_image(SimulationData &sim_data, WaveFunction &psi, const char * fits_file_name);
+void save_2d_image_potential(SimulationData &sim_data, double *potential, const char * fits_file_name);
 
 #endif    //    _SAVE_DATA_H

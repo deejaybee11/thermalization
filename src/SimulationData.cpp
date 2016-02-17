@@ -28,7 +28,6 @@
 #define _USE_MATH_DEFINES
 #include <math.h>
 
-#include "dmalloc.h"
 
 
 //Class constructor
@@ -40,19 +39,19 @@ SimulationData::SimulationData(int num_x, int num_y, int num_z) {
 	this->N = num_x * num_y * num_z;
 
 
-	this->length_x = 50;
-	this->length_y = 50;
-	this->length_z = 50;
+	this->length_x = 30;
+	this->length_y = 120;
+	this->length_z = 30;
 
-	this->num_I_steps = 0;
-	this->num_R_steps = 1;
+	this->num_I_steps = 10000;
+	this->num_R_steps = 0;
 
 	this->sigma_x = 1;
 	this->sigma_y = 1;
 	this->sigma_z = 1;
 
 	this->gamma_x = 1;
-	this->gamma_y = 2;
+	this->gamma_y = 1.5;
 	this->gamma_z = 3;
 
 	this->beta = 1;
@@ -66,7 +65,7 @@ SimulationData::SimulationData(int num_x, int num_y, int num_z) {
 	this->py = (double*)mkl_malloc(this->num_y * sizeof(double), 64);
 	this->pz = (double*)mkl_malloc(this->num_z * sizeof(double), 64);
 
-	this->chemical_potential = (double*)mkl_malloc(this->N * sizeof(double), 64);
+	this->chemical_potential = 0;//(double*)mkl_malloc(this->N * sizeof(double), 64);
 
 	for (int i = 0; i < this->num_x; ++i) {
 		this->x[i] = -0.5 * this->length_x + i * this->length_x / ((double)this->num_x);
@@ -82,8 +81,11 @@ SimulationData::SimulationData(int num_x, int num_y, int num_z) {
 	this->dy = this->y[1] - this->y[0];
 	this->dz = this->z[1] - this->z[0];
 
+	this->dx2 = this->dx * this->dx;
+	this->dy2 = this->dy* this->dy;
+	this->dz2 = this->dz * this->dz;
 
-	this->dt = 0.01*dx; 
+	this->dt = 1*dx; 
 
 	//Increments for the momenum arrays
 	double ax = -0.5 * this->num_x;
@@ -132,6 +134,8 @@ SimulationData::SimulationData(int num_x, int num_y, int num_z) {
 		this->pz[i] = this->pz[i + n2[2]];
 		this->pz[i+n2[2]] = temp;
 	}
+
+	this->laser_kick = 5;
 };
 
 //Class destructor
@@ -142,5 +146,5 @@ SimulationData::~SimulationData() {
 	mkl_free(px);
 	mkl_free(py);
 	mkl_free(pz);
-	mkl_free(chemical_potential);
+//	mkl_free(chemical_potential);
 };
