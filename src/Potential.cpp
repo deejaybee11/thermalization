@@ -104,6 +104,7 @@ void Potential::assign_position_time_evolution(SimulationData &sim_data, WaveFun
 
 	}
 	else {
+		#pragma omp parallel for private(theta)
 		for (int i = 0; i < sim_data.get_N(); ++i) {
 			theta = (this->non_linear[i] + this->harmonic_trap[i]) * 0.5 * sim_data.get_dt();	
 			this->pos_time_evolution[i].real = exp(-1.0 * theta);

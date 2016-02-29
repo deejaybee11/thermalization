@@ -64,15 +64,17 @@ void WaveFunction::create_superposition(SimulationData &sim_data) {
 
 	MKL_Complex16 *temp_psi;
 	temp_psi = (MKL_Complex16*)mkl_malloc(sim_data.get_N() * sizeof(MKL_Complex16), 64);
-
+	int index;
+	
+	#pragma omp parallel for private(index)
 	for (int i = 0; i < sim_data.get_num_x(); ++i) {
 		for (int j = 0; j < sim_data.get_num_y(); ++j) {
 			for (int k = 0; k < sim_data.get_num_z(); ++k) {
-				int index = i * sim_data.get_num_x() * sim_data.get_num_y() + j* sim_data.get_num_x() + k;
+				index = i * sim_data.get_num_y() * sim_data.get_num_z() + j* sim_data.get_num_z() + k;
 				temp_psi[index].real = this->psi[index].real;
 				temp_psi[index].imag = this->psi[index].imag;
-				this->psi[index].real = temp_psi[index].real * cos(2 * sim_data.laser_kick * sim_data.y[i]) - temp_psi[index].imag * sin(2 * sim_data.laser_kick * sim_data.y[i]);
-				this->psi[index].imag = temp_psi[index].imag * cos(2 * sim_data.laser_kick * sim_data.y[i]) + temp_psi[index].real * sin(2 * sim_data.laser_kick * sim_data.y[i]);
+				this->psi[index].real += temp_psi[index].real * cos(2 * sim_data.laser_kick * sim_data.y[j]) - temp_psi[index].imag * sin(2 * sim_data.laser_kick * sim_data.y[j]);
+				this->psi[index].imag += temp_psi[index].imag * cos(2 * sim_data.laser_kick * sim_data.y[j]) + temp_psi[index].real * sin(2 * sim_data.laser_kick * sim_data.y[j]);
 			}
 		}
 	}

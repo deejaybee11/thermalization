@@ -55,6 +55,8 @@ void solve_imag(SimulationData &sim_data, WaveFunction &psi, Potential &pot_data
 	for (int i = 0; i < sim_data.num_I_steps; ++i) { 
 		if (i % 100 == 0) {
 			std::cout << "Imaginary step " << i << " out of " << sim_data.num_I_steps << std::endl;
+
+
 		}
 		
 		psi.get_abs(sim_data.get_N());
@@ -96,11 +98,15 @@ void solve_real(SimulationData &sim_data, WaveFunction &psi, Potential &pot_data
 
 	for (int i = 0; i < sim_data.num_R_steps; ++i) {
 
+		psi.get_abs(sim_data.get_N());
+
 		if (i % 500 == 0) {
 			std::cout << "Real step " << i << " out of " << sim_data.num_R_steps << "." << std::endl;
+			std::string filename = "fits/psi" + std::to_string(i/500) + ".fits";
+			save_2d_image(sim_data, psi, filename.c_str());
 		}
 		
-		pot_data.assign_position_time_evolution(sim_data, psi, false, true);
+		pot_data.assign_position_time_evolution(sim_data, psi, true, true);
 		
 		vzMul(sim_data.get_N(), psi.psi, pot_data.pos_time_evolution, psi.psi);
 

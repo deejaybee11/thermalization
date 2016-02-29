@@ -103,3 +103,20 @@ void save_3d_image(SimulationData &sim_data, WaveFunction &psi, const char * fit
 	fits_report_error(stderr, status);	
 
 }
+
+void save_binary(SimulationData &sim_data, WaveFunction &psi, const char * filename) {
+
+	FILE *pFile;
+	pFile = fopen(filename, "wb");
+	fwrite(psi.psi, sizeof(MKL_Complex16), sim_data.get_N(), pFile); 
+	fclose(pFile);
+}
+
+void load_binary(SimulationData &sim_data, WaveFunction &psi, const char * filename) {
+
+	FILE *pFile;
+	pFile = fopen(filename, "rb");
+	fread(psi.psi, sizeof(MKL_Complex16), sim_data.get_N(), pFile);
+	fclose(pFile);
+}
+

@@ -23,16 +23,18 @@ class Main(QMainWindow, Ui_MainWindow):
         self.fig = Figure()
         self.ax = self.fig.add_subplot(111)
         self.canvas = FigureCanvas(self.fig)
+        self.mpl_toolbar = NavigationToolbar(self.canvas, self)
         self.matplotLayout.addWidget(self.canvas)
-        self.mydata = fits.open("../../C++/thermalization/testsave3D.fits")
+        self.matplotLayout.addWidget(self.mpl_toolbar)
+        self.mydata = fits.open("../../C++/thermalization/testexpand3D.fits")
         self.mydata = self.mydata[0].data
-        self.matplotScroll.setMaximum(len(self.mydata[:,:,0]) - 1)
-        self.matplotScroll.valueChanged.connect(self.show_img)
-        
-        
-    def show_img(self, ):
+        self.sbZ.setMaximum(len(self.mydata[:,:,0]))
+        self.sbZ.valueChanged.connect(self.show_img_spin)   
+        self.show_img_spin() 
 
-        self.ax.imshow(self.mydata[:,:,self.matplotScroll.value()], vmin=0, vmax = np.amax(self.mydata))        
+    def show_img_spin(self, ):
+
+        self.ax.imshow(self.mydata[:,:,self.sbZ.value()], vmin=0, vmax = np.amax(self.mydata))        
         self.canvas.draw()
         self.ax.clear()
 

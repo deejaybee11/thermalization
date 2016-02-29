@@ -44,7 +44,7 @@ SimulationData::SimulationData(int num_x, int num_y, int num_z) {
 	this->length_z = 30;
 
 	this->num_I_steps = 10000;
-	this->num_R_steps = 0;
+	this->num_R_steps = 100000;
 
 	this->sigma_x = 1;
 	this->sigma_y = 1;
@@ -85,7 +85,7 @@ SimulationData::SimulationData(int num_x, int num_y, int num_z) {
 	this->dy2 = this->dy* this->dy;
 	this->dz2 = this->dz * this->dz;
 
-	this->dt = 1*dx; 
+	this->dt = 0.0001*dx; 
 
 	//Increments for the momenum arrays
 	double ax = -0.5 * this->num_x;
@@ -135,7 +135,7 @@ SimulationData::SimulationData(int num_x, int num_y, int num_z) {
 		this->pz[i+n2[2]] = temp;
 	}
 
-	this->laser_kick = 5;
+	this->laser_kick = 50;
 };
 
 //Class destructor
