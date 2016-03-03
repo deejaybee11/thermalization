@@ -25,6 +25,7 @@
 #define THERMALIZATION_SIM_DATA_H
 
 #include <stdlib.h>
+#include <iostream>
 
 #include "mkl.h"
 
@@ -38,6 +39,11 @@ class SimulationData {
 public:
 	SimulationData(int num_x, int num_y, int num_z);
 	~SimulationData();
+	
+	time_t curr_time;
+	struct tm * mytime; 
+	char folder[80];
+	char command[80];
 
 	double *x;
 	double *y;

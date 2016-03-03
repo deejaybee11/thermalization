@@ -32,6 +32,13 @@
 
 //Class constructor
 SimulationData::SimulationData(int num_x, int num_y, int num_z) {
+	
+	time(&this->curr_time);
+	this->mytime = localtime(&this->curr_time);
+	sprintf(this->command, "mkdir fits/%.4d%.2d%.2d%.2d%.2d", 1900 + this->mytime->tm_year, 1 + mytime->tm_mon, mytime->tm_mday, mytime->tm_hour, mytime->tm_min);
+	system(this->command);
+	printf("Directory Created\n");
+	sprintf(this->folder, "fits/%.4d%.2d%.2d%.2d%.2d", 1900 + this->mytime->tm_year, 1 + mytime->tm_mon, mytime->tm_mday, mytime->tm_hour, mytime->tm_min);
 
 	this->num_x = num_x;
 	this->num_y = num_y;
@@ -44,7 +51,7 @@ SimulationData::SimulationData(int num_x, int num_y, int num_z) {
 	this->length_z = 30;
 
 	this->num_I_steps = 10000;
-	this->num_R_steps = 100000;
+	this->num_R_steps = 50000;
 
 	this->sigma_x = 1;
 	this->sigma_y = 1;
@@ -54,7 +61,7 @@ SimulationData::SimulationData(int num_x, int num_y, int num_z) {
 	this->gamma_y = 1.5;
 	this->gamma_z = 3;
 
-	this->beta = 1;
+	this->beta = 0;
 
 	//Allocate memory and assign numbers to the grids
 	this->x = (double*)mkl_malloc(this->num_x * sizeof(double), 64);
@@ -85,7 +92,7 @@ SimulationData::SimulationData(int num_x, int num_y, int num_z) {
 	this->dy2 = this->dy* this->dy;
 	this->dz2 = this->dz * this->dz;
 
-	this->dt = 0.0001*dx; 
+	this->dt = 0.001*dx; 
 
 	//Increments for the momenum arrays
 	double ax = -0.5 * this->num_x;
@@ -135,7 +142,7 @@ SimulationData::SimulationData(int num_x, int num_y, int num_z) {
 		this->pz[i+n2[2]] = temp;
 	}
 
-	this->laser_kick = 50;
+	this->laser_kick = 7;
 };
 
 //Class destructor

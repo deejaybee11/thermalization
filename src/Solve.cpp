@@ -28,6 +28,8 @@
 #define _USE_MATH_DEFINES
 #include <math.h>
 #include <stdexcept>
+#include <stdio.h>
+#include <string.h>
 
 #include "../include/SimulationData.hpp"
 #include "../include/WaveFunction.hpp"
@@ -102,8 +104,13 @@ void solve_real(SimulationData &sim_data, WaveFunction &psi, Potential &pot_data
 
 		if (i % 500 == 0) {
 			std::cout << "Real step " << i << " out of " << sim_data.num_R_steps << "." << std::endl;
-			std::string filename = "fits/psi" + std::to_string(i/500) + ".fits";
-			save_2d_image(sim_data, psi, filename.c_str());
+			char filename[200];
+			char full_filename[200];
+			strcat(full_filename, sim_data.folder);
+			sprintf(filename, "/psi%d.fits", i/500);
+			strcat(full_filename, filename);
+			std::cout << full_filename << std::endl;
+			save_2d_image(sim_data, psi, full_filename);
 		}
 		
 		pot_data.assign_position_time_evolution(sim_data, psi, true, true);
@@ -111,6 +118,16 @@ void solve_real(SimulationData &sim_data, WaveFunction &psi, Potential &pot_data
 		vzMul(sim_data.get_N(), psi.psi, pot_data.pos_time_evolution, psi.psi);
 
 		status = DftiComputeForward(handle, psi.psi, psi.psi);
+
+		if (i % 500 == 0) {
+			char filename[200];
+			char full_filename[200];
+			strcat(full_filename, sim_data.folder);
+			sprintf(filename, "/phi%d.fits", i/500);
+			strcat(full_filename, filename);
+			std::cout << full_filename << std::endl;
+			save_2d_image(sim_data, psi, full_filename);
+		}
 
 		vzMul(sim_data.get_N(), psi.psi, pot_data.mom_time_evolution, psi.psi);
 

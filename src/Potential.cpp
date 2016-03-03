@@ -65,7 +65,6 @@ Potential::Potential(SimulationData &sim_data) {
 		}
 	}
 	
-	save_2d_image_potential(sim_data, this->kinetic_energy, "kineticenergy.fits");
 }
 
 void Potential::calculate_non_linear_energy(SimulationData &sim_data, WaveFunction &psi) {
@@ -76,10 +75,6 @@ void Potential::calculate_non_linear_energy(SimulationData &sim_data, WaveFuncti
 	for (int i = 0; i < sim_data.get_N(); ++i) {
 		non_linear_val = sim_data.beta * psi.abs_psi[i];
 		this->non_linear[i] = non_linear_val;
-	}
-	std::ifstream ifile("nonlinear.fits");
-	if (!ifile) {
-		save_2d_image_potential(sim_data, this->non_linear, "nonlinear.fits");
 	}
 }
 

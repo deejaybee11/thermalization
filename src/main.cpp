@@ -48,10 +48,8 @@ int main() {
 	system("echo KMP_AFFINITY = $KMP_AFFINITY");
 	mkl_set_num_threads(mkl_get_max_threads());
 	mkl_disable_fast_mm();
-	system("exec rm *.fits");
-	system("exec rm fits/*.fits");
 	
-	bool load_bin = true;
+	bool load_bin = false;
 
 	SimulationData sim_data(128, 1024, 128);
 	Potential pot_data(sim_data);
@@ -64,10 +62,6 @@ int main() {
 	pot_data.assign_position_time_evolution(sim_data, psi, true, false);
 	pot_data.assign_momentum_time_evolution(sim_data, psi, false);
 
-
-	save_2d_image(sim_data, psi, "testsave.fits");
-	save_3d_image(sim_data, psi, "testsave3D.fits");
-
 	if (load_bin) {
 		load_binary(sim_data, psi, "ground_state.bin");	
 	} 
@@ -79,14 +73,11 @@ int main() {
 	
 	psi.get_abs(sim_data.get_N());
 	psi.get_norm(sim_data);
-	save_2d_image(sim_data, psi, "testground.fits");
-	save_3d_image(sim_data, psi, "testground3D.fits");
 
 	psi.create_superposition(sim_data);
 
 	psi.get_abs(sim_data.get_N());
-	save_2d_image(sim_data, psi, "testsuper.fits");
-	save_3d_image(sim_data, psi, "testsuper3D.fits");
+	psi.get_norm(sim_data);
 
 	pot_data.assign_position_time_evolution(sim_data, psi, false, true);
 	pot_data.assign_momentum_time_evolution(sim_data, psi, true);
@@ -94,10 +85,5 @@ int main() {
 	solve_real(sim_data, psi, pot_data);
 	
 	printf("Solving complete\n");
-
-	psi.get_abs(sim_data.get_N());
-	save_2d_image(sim_data, psi, "testexpand.fits");
-	save_3d_image(sim_data, psi, "testexpand3D.fits");
-		
 	return 0;
 }
