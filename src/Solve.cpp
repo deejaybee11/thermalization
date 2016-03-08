@@ -104,13 +104,17 @@ void solve_real(SimulationData &sim_data, WaveFunction &psi, Potential &pot_data
 
 		if (i % 500 == 0) {
 			std::cout << "Real step " << i << " out of " << sim_data.num_R_steps << "." << std::endl;
-			char filename[200];
-			char full_filename[200];
-			strcat(full_filename, sim_data.folder);
-			sprintf(filename, "/psi%d.fits", i/500);
-			strcat(full_filename, filename);
-			std::cout << full_filename << std::endl;
+			char buf1[200];
+			char buf2[200];
+			strcpy(buf1, sim_data.folder);
+			sprintf(buf2, "/psi%d.fits\0", i/500);
+			strcat(buf1, buf2);
+			int length = strlen(buf1);
+			char *full_filename;
+			full_filename = (char*)mkl_malloc(length*sizeof(char), 64);
+			strcpy(full_filename, buf1);
 			save_2d_image(sim_data, psi, full_filename);
+			mkl_free(full_filename);
 		}
 		
 		pot_data.assign_position_time_evolution(sim_data, psi, true, true);
@@ -119,14 +123,19 @@ void solve_real(SimulationData &sim_data, WaveFunction &psi, Potential &pot_data
 
 		status = DftiComputeForward(handle, psi.psi, psi.psi);
 
+
 		if (i % 500 == 0) {
-			char filename[200];
-			char full_filename[200];
-			strcat(full_filename, sim_data.folder);
-			sprintf(filename, "/phi%d.fits", i/500);
-			strcat(full_filename, filename);
-			std::cout << full_filename << std::endl;
+			char buf1[200];
+			char buf2[200];
+			strcpy(buf1, sim_data.folder);
+			sprintf(buf2, "/phi%d.fits\0", i/500);
+			strcat(buf1, buf2);
+			int length = strlen(buf1);
+			char *full_filename;
+			full_filename = (char*)mkl_malloc(length*sizeof(char), 64);
+			strcpy(full_filename, buf1);
 			save_2d_image(sim_data, psi, full_filename);
+			mkl_free(full_filename);
 		}
 
 		vzMul(sim_data.get_N(), psi.psi, pot_data.mom_time_evolution, psi.psi);

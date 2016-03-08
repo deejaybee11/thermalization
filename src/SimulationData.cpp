@@ -51,7 +51,7 @@ SimulationData::SimulationData(int num_x, int num_y, int num_z) {
 	this->length_z = 30;
 
 	this->num_I_steps = 10000;
-	this->num_R_steps = 50000;
+	this->num_R_steps = 10000;//50000;
 
 	this->sigma_x = 1;
 	this->sigma_y = 1;
