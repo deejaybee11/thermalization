@@ -50,8 +50,8 @@ SimulationData::SimulationData(int num_x, int num_y, int num_z) {
 	this->length_y = 120;
 	this->length_z = 30;
 
-	this->num_I_steps = 10000;
-	this->num_R_steps = 10000;//50000;
+	this->num_I_steps = 100000;
+	this->num_R_steps = 100000000;
 
 	this->sigma_x = 1;
 	this->sigma_y = 1;
@@ -61,7 +61,7 @@ SimulationData::SimulationData(int num_x, int num_y, int num_z) {
 	this->gamma_y = 1.5;
 	this->gamma_z = 3;
 
-	this->beta = 0;
+	this->beta = 2;
 
 	//Allocate memory and assign numbers to the grids
 	this->x = (double*)mkl_malloc(this->num_x * sizeof(double), 64);
