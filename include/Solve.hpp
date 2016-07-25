@@ -37,6 +37,9 @@ void solve_imag(SimulationData &sim_data, WaveFunction &psi, Potential &pot_data
 
 void solve_real(SimulationData &sim_data, WaveFunction &psi, Potential &pot_data);
 
+void solve_ramp_trap(SimulationData &sim_data, WaveFunction &psi, Potential &pot_data);
+
+
 
 #endif    //    _SOLVE_H
 

@@ -67,6 +67,26 @@ Potential::Potential(SimulationData &sim_data) {
 	
 }
 
+void Potential::calculate_harmonic_trap(SimulationData &sim_data) {
+
+	//Fill arrays with values
+	double h_pot_val = 0;
+	int index;
+
+	#pragma omp parallel for private(index, h_pot_val)
+	for (int i = 0; i < sim_data.get_num_x(); ++i) {
+		for (int j = 0; j < sim_data.get_num_y(); ++j) {
+			for (int k = 0; k < sim_data.get_num_z(); ++k) {
+
+				index = i * sim_data.get_num_y() * sim_data.get_num_z() + j * sim_data.get_num_z() + k;
+				h_pot_val = 0.5 * (pow(sim_data.gamma_x, 2) * pow(sim_data.x[i], 2) + pow(sim_data.gamma_y, 2) * pow(sim_data.y[j], 2) + pow(sim_data.gamma_z, 2) * pow(sim_data.z[k], 2));
+
+				this->harmonic_trap[index] = h_pot_val; 
+			}
+		}
+	}
+}
+
 void Potential::calculate_non_linear_energy(SimulationData &sim_data, WaveFunction &psi) {
 
 	double non_linear_val;

@@ -51,7 +51,7 @@ int main() {
 	
 	bool load_bin = false;
 
-	SimulationData sim_data(128, 1024, 128);
+	SimulationData sim_data(64, 512, 64); 
 	Potential pot_data(sim_data);
 	WaveFunction psi(sim_data, pot_data.harmonic_trap);
 
@@ -73,6 +73,8 @@ int main() {
 	
 	psi.get_abs(sim_data.get_N());
 	psi.get_norm(sim_data);
+
+	solve_ramp_trap(sim_data, psi, pot_data);
 
 	psi.create_superposition(sim_data);
 

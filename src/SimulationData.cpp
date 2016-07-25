@@ -39,6 +39,7 @@ SimulationData::SimulationData(int num_x, int num_y, int num_z) {
 	system(this->command);
 	printf("Directory Created\n");
 	sprintf(this->folder, "fits/%.4d%.2d%.2d%.2d%.2d", 1900 + this->mytime->tm_year, 1 + mytime->tm_mon, mytime->tm_mday, mytime->tm_hour, mytime->tm_min);
+	std::cout << "Folder " << this->folder << std::endl;
 
 	this->num_x = num_x;
 	this->num_y = num_y;
@@ -46,12 +47,12 @@ SimulationData::SimulationData(int num_x, int num_y, int num_z) {
 	this->N = num_x * num_y * num_z;
 
 
-	this->length_x = 30;
-	this->length_y = 120;
-	this->length_z = 30;
+	this->length_x = 15;
+	this->length_y = 60;
+	this->length_z = 15;
 
-	this->num_I_steps = 100000;
-	this->num_R_steps = 100000000;
+	this->num_I_steps = 1000;
+	this->num_R_steps = 10000;
 
 	this->sigma_x = 1;
 	this->sigma_y = 1;

@@ -23,6 +23,7 @@ from tkinter import filedialog as tk
 import os
 import struct
 from astropy.io import fits
+import datetime
 from matplotlib import cm
 import glob
 
@@ -31,27 +32,30 @@ plt.close("all")
 root = tk.Tk()
 root.withdraw()
 
-folder = tk.askdirectory()
+folder = os.getcwd()
 
 if not os.path.exists(folder+"/pngs"):
     os.makedirs(folder+"/pngs")
     
+date = tk.askdirectory()
+curr_date = date[-12:]
+
+if not os.path.exists(folder+"/pngs/"+curr_date):
+    os.makedirs(folder+"/pngs/"+curr_date)
 
 numfiles=0
-for i in glob.glob(folder+"/fits/psi" + "*.fits"):
+for i in glob.glob(date + "/phi" + "*.fits"):
     numfiles +=1
     
-for i in glob.glob(folder+"/pngs/" + "*.png"):
-    os.remove(i)
-
-#
+print(date)
+print(numfiles)
 
 ##
 for i in range(0,numfiles):
 
     print("Importing psi file number " + str(i))    
     
-    filename = folder + "/fits/psi" + str(i) + ".fits"
+    filename = date + "/psi" + str(i) + ".fits"
     fitsImage = fits.open(filename,mode='readonly')
     image = (fitsImage[0].data)
     fitsImage.close()
@@ -63,29 +67,11 @@ for i in range(0,numfiles):
     ax.imshow(image, cmap = cm.afmhot)
     
     if i<10:
-        plt.savefig(folder+"/pngs"+'/Psi00'+str(i)+'.png',dpi = 250)
+        plt.savefig(folder+"/pngs/" + curr_date + '/Psi00'+str(i)+'.png',dpi = 250)
     elif i>=10:
-        plt.savefig(folder+"/pngs"+'/Psi0'+str(i)+'.png',dpi = 250) 
+        plt.savefig(folder+"/pngs/" + curr_date  + '/Psi0'+str(i)+'.png',dpi = 250) 
 
     plt.close('all')
-#for i in range(0,numfiles):
-#    print("Importing phi file number " + str(i))    
-#    
-#    filename = folder + "/fits/phi" + str(i) + ".fits"
-#    fitsImage = fits.open(filename,mode='readonly')
-#    image2 = (fitsImage[0].data)
-#    fitsImage.close()
-#    
-#    plt.ioff()
-#
-#    
-#    fig, ax = plt.subplots()
-#    ax.imshow(np.fft.fftshift(image2), cmap = cm.afmhot)
-#    
-#    if i<10:
-#        plt.savefig(folder+"/pngs"+'/Phi00'+str(i)+'.png',dpi = 250)
-#    elif i>=10:
-#        plt.savefig(folder+"/pngs"+'/Phi0'+str(i)+'.png',dpi = 250) 
-#
-#    plt.close('all')
-#    
+
+
+

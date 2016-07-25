@@ -45,6 +45,7 @@ public:
 	void calculate_non_linear_energy(SimulationData &sim_data, WaveFunction &psi);
 	void assign_position_time_evolution(SimulationData &sim_data, WaveFunction &psi, bool trap_on, bool is_real);
 	void assign_momentum_time_evolution(SimulationData &sim_data, WaveFunction &psi, bool is_real);
+	void calculate_harmonic_trap(SimulationData &sim_data);
 
 };
 
